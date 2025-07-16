@@ -4,10 +4,12 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 from torchvision import datasets, models, transforms
 import numpy as np
-from sklearn.metrics import classification_report, confusion_matrix
+from sklearn.metrics import classification_report, confusion_matrix, roc_curve, auc
+from sklearn.preprocessing import label_binarize
 import matplotlib.pyplot as plt
 import seaborn as sns
 from tqdm import tqdm
+from itertools import cycle
 
 # --- Configuration ---
 PROCESSED_DATA_PATH = './processed_data'
@@ -57,6 +59,7 @@ print("\nRunning evaluation...")
 
 all_preds = []
 all_labels = []
+all_scores = []
 
 with torch.no_grad(): # Deactivates autograd engine, reduces memory usage and speeds up computations
     for inputs, labels in tqdm(validation_loader, desc="Evaluating"):
@@ -64,18 +67,27 @@ with torch.no_grad(): # Deactivates autograd engine, reduces memory usage and sp
         labels = labels.to(device)
 
         outputs = model(inputs)
+        
+        # Get probability scores for ROC curve
+        scores = torch.nn.functional.softmax(outputs, dim=1)
         _, preds = torch.max(outputs, 1)
 
         all_preds.extend(preds.cpu().numpy())
         all_labels.extend(labels.cpu().numpy())
+        all_scores.extend(scores.cpu().numpy())
 
 print("Evaluation complete.")
+
+# Convert lists to numpy arrays
+all_labels = np.array(all_labels)
+all_preds = np.array(all_preds)
+all_scores = np.array(all_scores)
 
 # --- Results ---
 print("\n--- Classification Report ---")
 print(classification_report(all_labels, all_preds, target_names=class_names))
 
-print("--- Confusion Matrix ---")
+print("\n--- Confusion Matrix ---")
 cm = confusion_matrix(all_labels, all_preds)
 plt.figure(figsize=(10, 8))
 sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=class_names, yticklabels=class_names)
@@ -84,3 +96,37 @@ plt.ylabel('True')
 plt.title('Confusion Matrix')
 plt.savefig('confusion_matrix.png')
 print("Confusion matrix saved to confusion_matrix.png")
+
+# --- ROC and AUC ---
+print("\n--- Generating ROC and AUC... ---")
+
+# Binarize the labels for One-vs-Rest (OvR) ROC curve calculation
+y_test_binarized = label_binarize(all_labels, classes=range(num_classes))
+
+# Dictionaries to hold ROC curve data
+fpr = dict()
+tpr = dict()
+roc_auc = dict()
+
+for i in range(num_classes):
+    fpr[i], tpr[i], _ = roc_curve(y_test_binarized[:, i], all_scores[:, i])
+    roc_auc[i] = auc(fpr[i], tpr[i])
+
+# Plot all ROC curves
+plt.figure(figsize=(12, 10))
+
+colors = cycle(['aqua', 'darkorange', 'cornflowerblue', 'deeppink', 'navy', 'green'])
+for i, color in zip(range(num_classes), colors):
+    plt.plot(fpr[i], tpr[i], color=color, lw=2,
+             label='ROC curve of class {0} (area = {1:0.2f})'
+             ''.format(class_names[i], roc_auc[i]))
+
+plt.plot([0, 1], [0, 1], 'k--', lw=2) # Dashed diagonal
+plt.xlim([0.0, 1.0])
+plt.ylim([0.0, 1.05])
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('Multi-class Receiver Operating Characteristic (ROC) Curves')
+plt.legend(loc="lower right")
+plt.savefig('roc_curves.png')
+print("ROC curves saved to roc_curves.png")
