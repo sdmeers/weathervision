@@ -19,7 +19,7 @@ def classify_image(image_path):
     data = {
         #"model": "llama3.2-vision",
         "model": "gemma3:4b-it-qat",
-        "prompt": "You are a weather classification expert. Your task is to analyze images and classify the weather conditions into one of the following categories: \"Sunny\", \"Cloudy\", \"Rainy\", \"Snowy\", or \"Foggy\". Respond with only a single word corresponding to the most prominent weather condition in the image.",
+        "prompt": "You are a weather classification expert. Your task is to analyze images and classify the weather conditions into one of the following categories: \"Sunny\", \"Cloudy\", \"Rainy\", \"Snowy\", \"Sunrise\", or \"Foggy\". Respond with only a single word corresponding to the most prominent weather condition in the image.",
         "stream": False,
         "images": [encoded_string]
     }

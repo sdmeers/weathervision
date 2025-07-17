@@ -1,4 +1,5 @@
 no_sync/
 dataset/
 processed_data/
+processed_data_vision_model/
 model.pth
