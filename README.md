@@ -112,13 +112,9 @@ Below are the performance results for both models.
 | Macro Avg  | 0.98      | 0.97   | 0.97     | 225     |
 | Weighted Avg| 0.97      | 0.97   | 0.97     | 225     |
 
-**Confusion Matrix:**
-
-![ResNet-18 Confusion Matrix](confusion_matrix.png)
-
-**ROC Curves:**
-
-![ResNet-18 ROC Curves](roc_curves.png)
+| Confusion Matrix | ROC Curves |
+| :---: | :---: |
+| ![ResNet-18 Confusion Matrix](confusion_matrix.png) | ![ResNet-18 ROC Curves](roc_curves.png) |
 
 ### Model 2: Gemma 3 Results
 
@@ -134,13 +130,9 @@ Below are the performance results for both models.
 | Macro Avg  | 0.90      | 0.90   | 0.89     | 153     |
 | Weighted Avg| 0.91      | 0.89   | 0.88     | 153     |
 
-**Confusion Matrix:**
-
-![Gemma 3 Confusion Matrix](ollama_confusion_matrix.png)
-
-**ROC Curves:**
-
-![Gemma 3 ROC Curves](ollama_roc_curves.png)
+| Confusion Matrix | ROC Curves |
+| :---: | :---: |
+| ![Gemma 3 Confusion Matrix](ollama_confusion_matrix.png) | ![Gemma 3 ROC Curves](ollama_roc_curves.png) |
 
 ## Dependencies
 
