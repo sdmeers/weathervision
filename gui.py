@@ -1,6 +1,6 @@
 
 import tkinter as tk
-from tkinter import filedialog, ttk
+from tkinter import filedialog, ttk, font
 from PIL import Image, ImageTk
 import torch
 import torch.nn as nn
@@ -90,25 +90,62 @@ class WeatherVisionApp:
         self.root = root
         self.root.title("WeatherVision Classifier")
         self.root.geometry("600x600")
+        self.root.configure(bg='white') # Set background to white
 
         self.image_path = None
 
+        # --- Styling ---
+        style = ttk.Style()
+        style.theme_use('clam') # Use 'clam' theme for a modern look
+
+        # Configure fonts
+        self.custom_font_large = font.Font(family="Helvetica Neue", size=14, weight="bold")
+        self.custom_font_medium = font.Font(family="Helvetica Neue", size=12)
+
+        # Configure button style
+        style.configure('TButton',
+                        font=self.custom_font_medium,
+                        background='#2196F3', # Blue
+                        foreground='white',
+                        padding=10,
+                        relief='flat')
+        style.map('TButton',
+                  background=[('active', '#1976D2')],
+                  foreground=[('disabled', 'white')])
+
+        # Configure Combobox style
+        style.configure('TCombobox',
+                        font=self.custom_font_medium,
+                        fieldbackground='white',
+                        background='white',
+                        foreground='black')
+        style.map('TCombobox',
+                  fieldbackground=[('readonly', 'white')],
+                  selectbackground=[('readonly', 'white')],
+                  selectforeground=[('readonly', 'black')])
+
+        # Configure Label style
+        style.configure('TLabel',
+                        background='white',
+                        foreground='black',
+                        font=self.custom_font_medium)
+
         # --- Widgets ---
-        self.load_button = tk.Button(root, text="Load Image", command=self.load_image)
-        self.load_button.pack(pady=10)
+        self.load_button = ttk.Button(root, text="Load Image", command=self.load_image)
+        self.load_button.pack(pady=15)
 
-        self.image_label = tk.Label(root)
-        self.image_label.pack(pady=10)
+        self.image_label = tk.Label(root, bg='white') # Ensure image label background is white
+        self.image_label.pack(pady=15)
 
-        self.model_var = tk.StringVar(value="ResNet-18")
+        self.model_var = tk.StringVar(value="Gemma 3")
         self.model_menu = ttk.Combobox(root, textvariable=self.model_var, values=["ResNet-18", "Gemma 3"], state="readonly")
-        self.model_menu.pack(pady=10)
+        self.model_menu.pack(pady=15)
 
-        self.classify_button = tk.Button(root, text="Classify Image", command=self.classify_image, state=tk.DISABLED)
-        self.classify_button.pack(pady=10)
+        self.classify_button = ttk.Button(root, text="Classify Image", command=self.classify_image, state=tk.DISABLED)
+        self.classify_button.pack(pady=15)
 
-        self.result_label = tk.Label(root, text="Result will be shown here", font=("Helvetica", 14))
-        self.result_label.pack(pady=20)
+        self.result_label = tk.Label(root, text="Result will be shown here", font=self.custom_font_large, bg='white')
+        self.result_label.pack(pady=25)
 
     def load_image(self):
         self.image_path = filedialog.askopenfilename()
